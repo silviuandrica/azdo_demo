@@ -1,0 +1,24 @@
+parameters:
+  - name: stages
+    type: stageList
+    default: []
+
+stages:
+- ${{ each stage in parameters.stages }}:
+  - stage: ${{ stage.stage }}
+    ${{ each property in stage }}:
+      ${{ if eq(notIn(property.key, 'jobs', 'stage'), 'True') }}:
+        ${{ property.key }} : ${{ property.value }}
+    jobs:
+      - ${{ each job in stage.jobs }}:
+          - ${{ if eq(job.job, 'job1_1')}}:          
+            - job: ${{ job.job }}
+              ${{ each property in job }}:
+                ${{ if notIn(property.key, 'job', 'steps') }}:
+                  ${{ property.key }} : ${{ property.value }}
+              steps:
+                - ${{ each step in job.steps }}:
+                  - ${{ step }}
+                - script: echo Injected method
+          - ${{ else }}:
+            - ${{ job }}
