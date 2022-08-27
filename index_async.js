@@ -15,14 +15,13 @@ module.exports = async function (context, req) {
     context.res = {
     };
 
-    checkTimeline(accessToken, projectId, buildId, taskinstanceId, jobId, planUrl, hubname, planId, context);
+    checkTimeline(accessToken, projectId, buildId, taskinstanceId, jobId, planUrl, hubname, planId);
 }
 
-function checkTimeline(accessToken, projectId, buildId, taskinstanceId, jobId, planUrl, hubname, planId, context){
+async function checkTimeline(accessToken, projectId, buildId, taskinstanceId, jobId, planUrl, hubname, planId){
     const taskIdToCheckFor = "d9bafed4-0b18-4f58-968d-86655b4d2ce9";
 
     const url = `${planUrl}${projectId}/_apis/build/builds/${buildId}/timeline`;
-    console.log(`URL ${url}`);
 
     const headers = {
         'Authorization':  `bearer ${accessToken}`
@@ -33,41 +32,33 @@ function checkTimeline(accessToken, projectId, buildId, taskinstanceId, jobId, p
     }).then(response => {
         const tasks = response.data.records.filter(record => record.type == "Task" && record.task);
         if (tasks && tasks.find(record => record.task.id == taskIdToCheckFor)) {
-            sendOK(projectId, taskinstanceId, jobId, planUrl, hubname, planId);
+            sendResponse(accessToken, projectId, taskinstanceId, jobId, planUrl, hubname, planId, 'succeeded');
         } else {
-            sendNOK(projectId, taskinstanceId, jobId, planUrl, hubname, planId);
+            sendResponse(accessToken, projectId, taskinstanceId, jobId, planUrl, hubname, planId, 'failed');
         }
     }).catch(function (error) {
         console.log(error);
     });
 }
 
-function sendOK(projectId, taskinstanceId, jobId, planUrl, hubname, planId) {
-    console.log('Sending OK');
+function sendResponse(accessToken, projectId, taskinstanceId, jobId, planUrl, hubname, planId, status) {
+    const headers = {
+        'Authorization':  `bearer ${accessToken}`
+    };
+
     const body = {
         name: 'TaskCompleted',
-        result: 'succeeded',
+        result: status,
         taskId: taskinstanceId,
         jobId: jobId
     }
-    sendResponse(body, projectId, planUrl, hubname, planId);
-}
 
-function sendNOK(projectId, taskinstanceId, jobId, planUrl, hubname, planId) {
-    console.log('Sending NOK');
-    const body = {
-        name: 'TaskCompleted',
-        result: 'failed',
-        taskId: taskinstanceId,
-        jobId: jobId
-    }
-    sendResponse(body, projectId, planUrl, hubname, planId);
-}
-
-function sendResponse(body, projectId, planUrl, hubname, planId) {
-    setTimeout((_ => {
-        const url = `${planUrl}${projectId}/_apis/distributedtask/hubs/${hubname}/plans/${planId}/events`;
-        console.log(url);
-        axios.post(url, body).then(response => console.log(`Callback done ${response.status}`));
-    }), 1000);
+    const url = `${planUrl}${projectId}/_apis/distributedtask/hubs/${hubname}/plans/${planId}/events`;
+    axios.post(url, body, { 
+        headers: headers,
+        params: {
+            'api-version': '2.0-preview.1'
+        }} ).then(response => {
+            console.log(`Callback done ${response.status} ${response.body}`);
+        }).catch(error => console.log(error));
 }
