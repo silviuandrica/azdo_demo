@@ -7,7 +7,7 @@ stages:
 - ${{ each stage in parameters.stages }}:
   - stage: ${{ stage.stage }}
     ${{ each property in stage }}:
-      ${{ if eq(notIn(property.key, 'jobs', 'stage'), 'True') }}:
+      ${{ if notIn(property.key, 'jobs', 'stage') }}:
         ${{ property.key }} : ${{ property.value }}
     jobs:
       - ${{ each job in stage.jobs }}:
