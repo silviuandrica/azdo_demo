@@ -1,1 +1,1 @@
-Template example
+Templates example
