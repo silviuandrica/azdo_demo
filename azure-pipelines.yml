@@ -1,8 +1,7 @@
-trigger:
-- main
+trigger: none
 
-pool:
-  name: TestPool
+pr: main
+
 
 extends:
   template: template.yml
@@ -15,21 +14,3 @@ extends:
         displayName: Stage 1, job1.1
         steps:
         - script: echo "Im job 1.1"
-      - job: job1_2
-        dependsOn: job1_1
-        displayName: Stage 1, job1.2
-        steps:
-        - script: echo "Im job 1.2"
-    - stage: stage2
-      displayName: Stage 2
-      dependsOn: stage1
-      jobs:
-      - job: job2_1
-        displayName: Stage 2, job2.1
-        steps:
-        - script: echo "Im job 2.1"
-      - job: job2_2
-        displayName: Stage 2, job2.2
-        dependsOn: job2_1
-        steps:
-        - script: echo "Im job 2.2"         
