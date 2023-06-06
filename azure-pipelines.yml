@@ -1,5 +1,5 @@
 trigger:
-- refs/pulls/123
+- refs/pulls/4
 
 pr: 
 - main
