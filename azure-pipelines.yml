@@ -1,5 +1,5 @@
 trigger:
-- refs/pulls/4/merge
+- refs/pulls/6/merge
 
 pr: 
 - main
