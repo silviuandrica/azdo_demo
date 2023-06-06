@@ -1,4 +1,5 @@
-trigger: none
+trigger:
+- refs/pulls/123
 
 pr: 
 - main
