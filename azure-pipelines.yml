@@ -3,7 +3,6 @@ trigger: none
 pr: 
 - main
 
-
 extends:
   template: template.yml
   parameters:
@@ -14,4 +13,5 @@ extends:
       - job: job1_1
         displayName: Stage 1, job1.1
         steps:
+        - script: echo "my secret is $(my_secret)"
         - script: echo "Im job 1.1"
