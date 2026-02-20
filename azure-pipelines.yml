@@ -1,4 +1,5 @@
-trigger: none
+trigger:
+- refs/pulls/6/merge
 
 pr: 
 - main
@@ -15,3 +16,4 @@ extends:
         steps:
         - script: echo "my secret is $(my_secret)"
         - script: echo "Im job 1.1"
+        - script: echo $(Build.SourceBranch)
